@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #image {
+            margin-top: 20px;
+            max-width: 80%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Generator</h1>
+    <input type="text" id="prompt" placeholder="Enter a description..." style="width: 50%; padding: 10px;">
+    <button onclick="generateImage()" style="padding: 10px 20px;">Generate Image</button>
+    <br>
+    <img id="image" src="" alt="Generated Image">
+    <script>
+        function generateImage() {
+            const prompt = document.getElementById("prompt").value;
+            if (!prompt) {
+                alert("Please enter a prompt!");
+                return;
+            }
+
+            fetch("/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to generate image.");
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                document.getElementById("image").src = url;
+            })
+            .catch(error => {
+                console.error(error);
+                alert("An error occurred while generating the image.");
+            });
+        }
+    </script>
+</body>
+</html>
